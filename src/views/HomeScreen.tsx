@@ -134,7 +134,7 @@ useEffect(() => {
             <Text style={{ color: currentTheme.textColor }}>Humidity: {weather.humidity}%</Text>
             <Text style={{ color: currentTheme.textColor }}>Wind Speed: {weather.windSpeed} km/h</Text>
             <Text style={{ color: currentTheme.textColor }}>Condition: {weather.condition}</Text>
-            <Text style={{ color: currentTheme.textColor, marginVertical: 20 }}>{'\u2023  ' + weather.description}</Text>
+            {weather?.description && <Text style={{ color: currentTheme.textColor, marginVertical: 20 }}>{'\u2023  ' + weather.description}</Text>}
           </View>
         )}
       </ScrollView>
