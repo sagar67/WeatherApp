@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, TextInput, ActivityIndicator, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
+import { View, Text, TextInput, ActivityIndicator, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, RefreshControl, Appearance } from "react-native";
 import { useWeatherViewModel } from "../viewModels/WeatherViewModel";
 import { useTheme } from "../utils/ThemeContext";
 import { darkTheme, lightTheme } from "../utils/themes";
@@ -16,11 +16,36 @@ const HomeScreen = () => {
 
   const { theme, toggleTheme } = useTheme();
   const currentTheme = theme === 'light' ? lightTheme : darkTheme;
+  const [systemTheme, setSystemTheme] = useState(Appearance.getColorScheme());
 
-  useEffect(() => {
-    loadCachedWeather();
-    loadLastCity();
-  }, []);
+useEffect(() => {
+  const initializeApp = async () => {
+    const initialSystemTheme = Appearance.getColorScheme();
+    setSystemTheme(initialSystemTheme);
+
+    if (initialSystemTheme === 'dark' && theme === 'light') {
+      toggleTheme();
+    } else if (initialSystemTheme === 'light' && theme === 'dark') {
+      toggleTheme();
+    }
+
+    await loadCachedWeather();
+    await loadLastCity();
+  };
+
+  initializeApp();
+
+  const subscription = Appearance.addChangeListener(({ colorScheme }) => {
+    setSystemTheme(colorScheme);
+    if (colorScheme === 'dark' && theme === 'light') {
+      toggleTheme();
+    } else if (colorScheme === 'light' && theme === 'dark') {
+      toggleTheme();
+    }
+  });
+
+  return () => subscription.remove();
+}, []);
 
   const loadLastCity = async () => {
     try {
